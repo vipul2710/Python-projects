@@ -82,5 +82,16 @@ poetry add feedparser requests readability-lxml jinja2 weasyprint pydantic sqlit
 
 ---
 
+---
+## 06/09/2025
+## 7. Configuring Sources (sources.yaml)
+
+- **What we did:** Created `configs/sources.yaml` to store curated RSS/blog feeds by category.  
+- **Why:** Keeps the pipeline flexible — we can add/remove feeds without touching code.  
+- **Where used:** The ingestion module will read this file to know which sources to fetch.  
+
+### Notes for future
+- Current version has 2–3 high-quality feeds per category for testing.  
+- After MVP, we’ll expand using external discovery (e.g. Perplexity suggestions) and add a `priority` field.
 
 ```
