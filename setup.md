@@ -95,3 +95,19 @@ poetry add feedparser requests readability-lxml jinja2 weasyprint pydantic sqlit
 - After MVP, we’ll expand using external discovery (e.g. Perplexity suggestions) and add a `priority` field.
 
 ```
+
+---
+
+## 8. Prompt templates (configs/prompts)
+
+- **What we did:** Created two prompt template files:
+  - `configs/prompts/brief.md` — short 2–3 bullet brief.
+  - `configs/prompts/extended.md` — longer context: "Why it matters" + "Recommendations".
+
+- **Why:** Keeping prompts in files makes the summarization behavior configurable without changing code. We can tweak tone, length, or structure anytime.
+
+- **Where used:** The summarizer module will load these templates and send them to the LLM (GPT or Claude) to produce consistent outputs.
+
+### Notes / Tips
+- The `brief.md` currently limits output to 420 characters — this is adjustable (e.g., 1000 chars) by editing the file.
+- Keep prompt wording explicit (tone, max length, required sections) to reduce hallucinations and get repeatable summaries.
