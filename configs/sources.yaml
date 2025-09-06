@@ -1,0 +1,44 @@
+# sources.yaml
+# Each category has a list of RSS feeds or site URLs we will pull from.
+
+AI_ML_Analytics:
+  - https://blog.google/technology/ai/rss/
+  - https://openai.com/research/feed.xml
+  - https://huggingface.co/blog/feed.xml
+
+Data_Mesh_Modern_Architectures:
+  - https://martinfowler.com/feed.atom
+  - https://www.thoughtworks.com/rss/insights.xml
+  - https://databricks.com/feed
+
+Digital_Leadership_CEO:
+  - https://hbr.org/rss
+  - https://www.mckinsey.com/feeds/rss
+
+Digital_Transformation:
+  - https://sloanreview.mit.edu/feed/
+  - https://www.bcg.com/feed
+
+Emerging_Tech:
+  - https://a16z.com/feed/
+  - https://blogs.nvidia.com/feed/
+
+Automation_Workflow:
+  - https://zapier.com/blog/feeds/latest/
+  - https://airflow.apache.org/blog/index.xml
+
+Industry_Analytics:
+  - https://aws.amazon.com/blogs/industries/feed/
+  - https://cloud.google.com/blog/topics/industries/rss
+
+Regulations_Governance:
+  - https://artificialintelligenceact.eu/feed/
+  - https://www.nist.gov/feeds
+
+Conversational_Analytics:
+  - https://www.microsoft.com/en-us/research/feed/
+  - https://www.snowflake.com/feed/
+
+ROI_Case_Studies:
+  - https://www.databricks.com/customers/feed
+  - https://www.snowflake.com/customers/feed
