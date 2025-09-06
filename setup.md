@@ -111,3 +111,12 @@ poetry add feedparser requests readability-lxml jinja2 weasyprint pydantic sqlit
 ### Notes / Tips
 - The `brief.md` currently limits output to 420 characters — this is adjustable (e.g., 1000 chars) by editing the file.
 - Keep prompt wording explicit (tone, max length, required sections) to reduce hallucinations and get repeatable summaries.
+
+
+---
+
+## 9. YAML Support (PyYAML)
+
+- **What we did:** Installed `pyyaml` using Poetry.
+- **Why:** Required to parse `.yaml` configuration files (e.g., `sources.yaml`) into Python objects.
+- **Where used:** The CLI (`cli.py`) loads `configs/sources.yaml` with PyYAML so the pipeline knows which feeds to process.
