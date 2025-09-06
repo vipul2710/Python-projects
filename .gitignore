@@ -1,0 +1,21 @@
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Poetry lock (optional if you don’t want to share lock)
+poetry.lock
+
+# Data and cache
+data/cache/
+data/output/
+
+# VS Code settings
+.vscode/
+
+# OS junk
+.DS_Store
+Thumbs.db
