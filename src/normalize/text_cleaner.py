@@ -2,6 +2,21 @@ import requests
 from readability import Document
 from lxml import html
 
+def normalize_text(content: str) -> str:
+    """
+    Normalize encoding issues (like Â® symbols) and clean whitespace.
+    """
+    if not content:
+        return ""
+    try:
+        # Try fixing common UTF-8 / Latin-1 mismatches
+        content = content.encode("latin-1", "ignore").decode("utf-8", "ignore")
+    except Exception:
+        # Fallback to utf-8 only
+        content = content.encode("utf-8", "ignore").decode("utf-8", "ignore")
+
+    return content.strip()
+
 def clean_article(url: str) -> dict:
     """
     Fetch a URL and return cleaned article content using readability-lxml.
@@ -19,9 +34,12 @@ def clean_article(url: str) -> dict:
         tree = html.fromstring(content_html)
         content_text = tree.text_content()
 
+        # Normalize encoding problems
+        content_text = normalize_text(content_text)
+
         return {
             "title": doc.short_title(),
-            "content": content_text.strip()
+            "content": content_text
         }
     except Exception as e:
         print(f"⚠️ Failed to clean {url}: {e}")

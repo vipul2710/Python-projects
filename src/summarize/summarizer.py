@@ -11,7 +11,7 @@ def load_prompt(name: str) -> str:
     return p.read_text(encoding="utf-8")
 
 class Summarizer:
-    def __init__(self, provider: str = "mock"):
+    def __init__(self, provider: str = "openai"):
         self.db = Database()
         # preload prompts (editable files)
         self.brief_prompt = load_prompt("brief.md")

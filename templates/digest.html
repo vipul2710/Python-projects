@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Agentic AI Digest</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        h1 { color: #2c3e50; }
+        h2 { margin-top: 20px; }
+        .article { margin-bottom: 30px; }
+        .brief { font-weight: bold; }
+        .extended { margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Agentic AI Digest</h1>
+    <p>Weekly curated insights from your AI pipeline.</p>
+    <hr/>
+    {% for row in articles %}
+    <div class="article">
+        <h2>{{ row.title }}</h2>
+        <p class="brief">{{ row.summary_brief }}</p>
+        <p class="extended">{{ row.summary_extended }}</p>
+        <p><small>Source: <a href="{{ row.link }}">{{ row.link }}</a></small></p>
+    </div>
+    {% endfor %}
+</body>
+</html>
