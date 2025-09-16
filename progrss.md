@@ -42,8 +42,9 @@ Agentic AI Digest is a small pipeline that automatically pulls tech & industry u
 - **Jinja2 + WeasyPrint:** simple HTML → PDF pipeline for clean output.
 
 ---
-
-## 5) How to run the parts (quick commands)
-- Run CLI skeleton:
-  ```powershell
-  python cli.py
+**Day 5**
+- Added Renderer module with Jinja2 templates (HTML digest working).
+- Digest now shows date and clickable source links.
+- CLI updated with subcommands: ingest, summarize, render.
+- Ingestion now supports --limit flag for safe fetching.
+- Confirmed DB deduplication (46 articles stored, no duplicates).
