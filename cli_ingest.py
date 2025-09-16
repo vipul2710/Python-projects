@@ -7,14 +7,14 @@ import hashlib
 def compute_hash(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
-def run_ingestion():
+def run_ingestion(limit=2):
     print("🚀 Running ingestion pipeline...")
 
     # Step 1: load sources
     sources = load_sources()
 
     # Step 2: fetch raw feed items
-    raw_results = fetch_all_feeds(sources, limit=2)
+    raw_results = fetch_all_feeds(sources, limit=limit)
 
     # Step 3: init helpers
     deduper = Deduper()
@@ -44,7 +44,7 @@ def run_ingestion():
 
             # Dedup check (in-memory + DB)
             if deduper.is_duplicate(article["hash"]):
-                print(f"❌ In-memory duplicate skipped: {article['title']}")
+                print(f"❌ Duplicate skipped: {article['title']}")
                 continue
 
             db.insert_article(article)

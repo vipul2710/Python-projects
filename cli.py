@@ -22,7 +22,7 @@ def main():
 
     if args.command == "ingest":
         # run ingestion (cli_ingest uses its own limit inside - we keep it simple)
-        run_ingestion()
+        run_ingestion(limit=args.limit)
     elif args.command == "summarize":
         Summarizer().run(limit=args.limit)
     elif args.command == "render":
