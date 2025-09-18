@@ -57,3 +57,11 @@ Agentic AI Digest is a small pipeline that automatically pulls tech & industry u
   - Added footer with generated date
   - Verified clean HTML rendering via CLI
 
+  **Day 7**
+- Installed GTK runtime on Windows to enable WeasyPrint.
+- Successfully generated first PDF digest (`output.pdf`) using CLI.
+- Verified pipeline now supports both HTML and PDF exports.
+- End-to-end flow: ingest → summarize → render → PDF working.
+- Warnings appeared during PDF generation but output was valid.
+
+
