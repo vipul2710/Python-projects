@@ -48,3 +48,12 @@ Agentic AI Digest is a small pipeline that automatically pulls tech & industry u
 - CLI updated with subcommands: ingest, summarize, render.
 - Ingestion now supports --limit flag for safe fetching.
 - Confirmed DB deduplication (46 articles stored, no duplicates).
+
+**Day 6**
+  - Polished digest template:
+  - Cover page with title + date
+  - Styled category headers with dividers
+  - Improved article spacing, fonts, and source link styling
+  - Added footer with generated date
+  - Verified clean HTML rendering via CLI
+
