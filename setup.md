@@ -120,3 +120,109 @@ poetry add feedparser requests readability-lxml jinja2 weasyprint pydantic sqlit
 - **What we did:** Installed `pyyaml` using Poetry.
 - **Why:** Required to parse `.yaml` configuration files (e.g., `sources.yaml`) into Python objects.
 - **Where used:** The CLI (`cli.py`) loads `configs/sources.yaml` with PyYAML so the pipeline knows which feeds to process.
+
+
+
+---
+
+## 10. Ingestion (src/ingest/rss_loader.py)
+
+- **What we did:** Created the ingestion module `rss_loader.py` in `src/ingest/`.  
+- **Why:** To fetch live articles from RSS/Atom feeds defined in `configs/sources.yaml`.  
+- **Where used:** This module will be the first stage of the pipeline — pulling in raw content before normalization and summarization.
+
+### How it works
+1. Load categories + feed URLs from `sources.yaml` (using PyYAML).  
+2. For each feed, parse entries using `feedparser`.  
+3. Normalize entries into a consistent dict with:  
+   - `title`  
+   - `link`  
+   - `published`  
+   - `summary` (short preview)  
+4. Return everything grouped by category.  
+
+### Example Output
+📂 AI_ML_Analytics (4 items)
+
+Get Gemini’s help in Google Sheets... (https://blog.google/products/workspace/workspace-feature-drop-ai-sheets/
+)
+
+Veo 3 comes to Google Photos... (https://blog.google/products/photos/google-photos-create-tab-editing-tools/
+)
+
+
+### Notes
+- Currently fetches only the first 2–3 items per feed (for testing).  
+- Later we’ll add caching, deduplication, and database storage.
+
+
+---
+
+## 11. Normalization, Deduplication & Storage
+
+### Normalization (`text_cleaner.py`)
+- **What we did:** Added a module to fetch full article content using `requests + readability-lxml + lxml`.
+- **Why:** RSS feeds often only include short summaries. We need the full text for meaningful summarization.
+- **Where used:** Each feed entry’s link is passed to `clean_article()` to extract the main article body.
+
+### Deduplication (`deduper.py`)
+- **What we did:** Created a deduper that fingerprints each article’s text (SHA256 hash).
+- **Why:** Prevents storing/summarizing the same article multiple times across feeds.
+- **Where used:** Before inserting into DB, every article is checked with `is_duplicate()`.
+
+### Storage (`db.py`)
+- **What we did:** Added SQLite storage using `sqlite-utils`.
+- **Why:** Keeps articles persistent across runs, supports deduplication checks, and provides a base for search.
+- **Where used:** `Database.insert_article()` inserts only new items into the `articles` table.
+
+### Integration (`cli_ingest.py`)
+- **What we did:** Connected ingestion → normalization → deduplication → storage in a single script.
+- **Why:** This creates an end-to-end pipeline that:
+  1. Loads sources from `sources.yaml`
+  2. Fetches articles via feedparser
+  3. Cleans article text with `text_cleaner`
+  4. Deduplicates articles with `deduper`
+  5. Inserts new articles into SQLite via `db.py`
+
+### Example Run
+🚀 Running ingestion pipeline...
+
+📂 AI_ML_Analytics (4 items)
+✅ Inserted: Welcome EmbeddingGemma, Google's new efficient embedding model
+❌ Duplicate skipped: Welcome EmbeddingGemma, Google's new efficient embedding model
+
+### PDF Export Setup (Windows)
+
+- We use WeasyPrint for PDF generation. On Windows this requires GTK runtime.
+- Download the latest GTK runtime `.exe` installer from:
+  https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases
+- Install with default options (adds GTK to PATH).
+- Restart VS Code / terminal.
+- Generate PDF digest:
+  ```bash
+  poetry run python cli.py render --limit 5 --format pdf
+
+Output is saved as output.pdf in project folder.
+
+Notes:
+
+Some warnings may appear on Windows but PDF still works.
+
+HTML export (--format html) is available as fallback (no GTK needed).
+
+
+---
+
+## ✅ Final `progress.md` recap
+Append to the bottom:  
+
+```markdown
+### MVP Recap (Days 1–7)
+- Project setup with Python 3.11 + Poetry.
+- Feed ingestion → DB (dedup, normalization, encoding fix).
+- Summarizer with OpenAI provider (brief + extended consulting-style prompts).
+- Renderer with Jinja2 templates for HTML output.
+- Template polished: cover page, categories, spacing, footer.
+- CLI commands: ingest, summarize, render (with --limit and --format).
+- PDF export enabled via WeasyPrint + GTK runtime.
+- End-to-end MVP pipeline: ingest → summarize → render → PDF working.
