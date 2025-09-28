@@ -16,7 +16,9 @@ def main():
 
     p_render = subparsers.add_parser("render", help="Render digest")
     p_render.add_argument("--limit", type=int, default=10, help="Max articles to include in digest")
-    p_render.add_argument("--format", choices=["html","pdf"], default="html", help="Output format")
+    p_render.add_argument("--format", choices=["html","pdf","md"], default="pdf", help="Output format")
+    p_render.add_argument("--category", type=str, help="Filter by category")
+
 
     args = parser.parse_args()
 
@@ -28,10 +30,12 @@ def main():
     elif args.command == "render":
         renderer = Renderer()
         if args.format == "html":
-            renderer.render_html("output.html", limit=args.limit)
+            renderer.render_html("output.html", limit=args.limit,category=args.category)
+        elif args.format == "md":
+            renderer.render_md("digest.md", limit=args.limit, category=args.category)
         else:
             # Note: PDF requires GTK / WeasyPrint working on your system
-            renderer.render_pdf("output.pdf", limit=args.limit)
+            renderer.render_pdf("output.pdf", limit=args.limit,category=args.category)
     else:
         parser.print_help()
 
