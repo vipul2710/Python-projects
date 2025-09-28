@@ -13,6 +13,9 @@ def main():
 
     p_sum = subparsers.add_parser("summarize", help="Summarize new articles")
     p_sum.add_argument("--limit", type=int, default=5, help="Max articles to summarize")
+    p_sum.add_argument("--category", type=str, help="Filter by category")
+    p_sum.add_argument("--refresh", action="store_true", help="Reset existing summaries and regenerate")
+
 
     p_render = subparsers.add_parser("render", help="Render digest")
     p_render.add_argument("--limit", type=int, default=10, help="Max articles to include in digest")
@@ -26,7 +29,15 @@ def main():
         # run ingestion (cli_ingest uses its own limit inside - we keep it simple)
         run_ingestion(limit=args.limit)
     elif args.command == "summarize":
-        Summarizer().run(limit=args.limit)
+        from sqlite_utils import Database
+        db = Database("data/cache/digest.db")
+        if args.refresh and args.category:
+            # reset summaries in this category
+            for row in db["articles"].rows_where("category = :cat", {"cat": args.category}):
+                db["articles"].update(row["id"], {"summary_brief": None, "summary_extended": None})
+            print(f"🔄 Refreshed summaries for category: {args.category}")
+        Summarizer().run(limit=args.limit, category=args.category)
+        
     elif args.command == "render":
         renderer = Renderer()
         if args.format == "html":
