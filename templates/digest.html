@@ -60,7 +60,15 @@
     <div class="article">
         <h3>{{ row.title }}</h3>
         <p class="brief">{{ row.summary_brief }}</p>
-        <p class="extended">{{ row.summary_extended }}</p>
+        <div class="extended">
+        {{ row.summary_extended
+            | replace("Key Contribution", "<br><br><strong>Key Contribution</strong>")
+            | replace("Method/Approach", "<br><br><strong>Method/Approach</strong>")
+            | replace("Applications", "<br><br><strong>Applications</strong>")
+            | replace("Limitations/Future Work", "<br><br><strong>Limitations/Future Work</strong>")
+            | safe }}
+        </div>
+
         <p><small>Source: <a href="{{ row.url or row.link }}">{{ row.url or row.link }}</a></small></p>
     </div>
     {% endfor %}
