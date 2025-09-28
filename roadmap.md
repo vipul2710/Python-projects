@@ -43,3 +43,12 @@ Turn the MVP (ingest → summarize → render → PDF) into a usable product for
 - Verified new summaries generated for arXiv papers.
 - Note: `master` branch keeps consulting mode, `productization` branch now targets researchers.
 
+## Phase 8: CLI Polish & DB Cleanup (Complete ✅)
+- Added `--refresh` flag in `summarize` to reset and regenerate summaries in one step.
+- Configured CLI to default to researcher-style outputs.
+- Introduced DB cleanup utility (`cli.py clean`):
+  - `--days N`: delete articles older than N days.
+  - `--all`: reset DB completely.
+  - Uses `retention_days` from `configs/config.yaml` if no flag is given (default: 180 days).
+- Ensures DB stays lean and manageable over time.
+
