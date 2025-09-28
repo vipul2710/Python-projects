@@ -1,0 +1,2 @@
+retention_days: 90   # keep articles for ~6 months
+default_category: Arxiv_AI_Gaming
