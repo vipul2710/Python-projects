@@ -28,3 +28,14 @@ Turn the MVP (ingest → summarize → render → PDF) into a usable product for
 **Tracking**
 - Branch: `productization`
 - MVP remains stable in `master`.
+
+## Phase 6: arXiv Integration (Complete ✅)
+- Added arXiv ingestion via `arxiv` Python library.
+- Integrated dedup + DB insertion.
+- Summarization works category-specific (`Arxiv_AI_Gaming`).
+- Renderer and CLI updated to filter by category.
+- Successfully rendered arXiv-only digest in HTML/PDF/Markdown.
+
+## Phase 7: Markdown/Notion Export (In Progress 🚧)
+- Added Markdown export (`digest.md`) for easy sharing.
+- Next: explore Notion API integration for automatic weekly uploads.
