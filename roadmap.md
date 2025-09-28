@@ -36,6 +36,10 @@ Turn the MVP (ingest → summarize → render → PDF) into a usable product for
 - Renderer and CLI updated to filter by category.
 - Successfully rendered arXiv-only digest in HTML/PDF/Markdown.
 
-## Phase 7: Markdown/Notion Export (In Progress 🚧)
-- Added Markdown export (`digest.md`) for easy sharing.
-- Next: explore Notion API integration for automatic weekly uploads.
+## Phase 7: Researcher-Focused Summaries (Complete ✅)
+- Replaced consulting-style prompts with academic prompts.
+- Brief: key contributions in 2–3 bullets.
+- Extended: structured summary (contribution, method, applications, limitations).
+- Verified new summaries generated for arXiv papers.
+- Note: `master` branch keeps consulting mode, `productization` branch now targets researchers.
+
