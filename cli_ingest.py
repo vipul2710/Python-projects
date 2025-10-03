@@ -22,24 +22,27 @@ def run_ingestion(limit=2):
 
     # Step 4: process items
     for category, items in raw_results.items():
-        print(f"\n📂 {category} ({len(items)} items)")
         for item in items:
             url = item["link"]
             cleaned = clean_article(url)
 
+            # --- NEW: fallback for ACM or blocked sites ---
+            if not cleaned.get("content"):
+                cleaned["content"] = item.get("summary") or item.get("description") or ""
+            
             if not cleaned["content"]:
-                continue  # skip empty
+                continue  # still empty, skip
 
             # Create article record
             article = {
                 "url": url,
-                "title": cleaned["title"] or item["title"],
-                "published_at": item["published"],
+                "title": cleaned.get("title") or item.get("title"),
+                "published_at": item.get("published"),
                 "content": cleaned["content"],
                 "hash": compute_hash(cleaned["content"]),
                 "category": category,
                 "summary_brief": None,
-                "summary_extended": None
+                "summary_extended": None,
             }
 
             # Dedup check (in-memory + DB)

@@ -1,6 +1,20 @@
-AI_Gaming_Research:
-  - https://arxiv.org/rss/cs.HC
-  - https://www.jair.org/index.php/jair/gateway/plugin/WebFeedGatewayPlugin/rss2
-  - https://gameanalytics.com/blog/feed/
-  - http://www.gamesbrief.com/feed/
-  - https://www.gamedeveloper.com/rss.xml
+ACM_HCI_Game_Research:
+  - "https://dl.acm.org/action/showFeed?ui=0&mi=19n0l1t&type=search&feed=rss&query=%2526AllField%253DGameplay%2526content%253Dstandard%2526target%253Ddefault%2526sortBy%253Drecency"
+  - "https://dl.acm.org/action/showFeed?ui=0&mi=19n0l1t&type=search&feed=rss&query=%2526ConceptID%253D99%2526content%253Dstandard%2526sortBy%253DEpubDate_desc%2526target%253Ddefault"
+  - "https://dl.acm.org/action/showFeed?ui=0&mi=19n0l1t&type=search&feed=rss&query=%2526AllField%253DGame%252Bdesign%2526content%253Dstandard%2526target%253Ddefault%2526sortBy%253Drecency"
+
+
+#Arxiv_AI_Gaming_Filtered:
+#  - 'arxiv:cat:cs.HC AND ("video game" OR "video games" OR "digital games" OR "game design" OR "gameful design" OR "player modeling" OR "human-computer interaction" OR "player experience" OR "gameplay" OR "gamification" OR "serious games")'
+
+
+#Arxiv_AI_Gaming:
+#  - cs.HC
+#  - cs.AI
+#  - cs.LG
+
+#AI_Gaming_Research:
+#  - https://www.jair.org/index.php/jair/gateway/plugin/WebFeedGatewayPlugin/rss2
+#  - https://gameanalytics.com/blog/feed/
+#  - http://www.gamesbrief.com/feed/
+#  - https://www.gamedeveloper.com/rss.xml
