@@ -1,56 +1,62 @@
+# cli_ingest.py
+import hashlib
 from src.ingest.rss_loader import load_sources, fetch_all_feeds
 from src.normalize.text_cleaner import clean_article
 from src.normalize.deduper import Deduper
 from src.normalize.db import Database
-import hashlib
 
-def compute_hash(text: str) -> str:
-    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+def compute_hash(doi: str, title: str) -> str:
+    seed = (doi or "") + "|" + (title or "")
+    return hashlib.sha256(seed.lower().encode("utf-8")).hexdigest()
 
-def run_ingestion(limit=2):
-    print("🚀 Running ingestion pipeline...")
+def run_ingestion(limit=10):
+    print("🚀 Running ingestion...")
 
-    # Step 1: load sources
     sources = load_sources()
-
-    # Step 2: fetch raw feed items
     raw_results = fetch_all_feeds(sources, limit=limit)
 
-    # Step 3: init helpers
     deduper = Deduper()
     db = Database()
 
-    # Step 4: process items
     for category, items in raw_results.items():
         for item in items:
             url = item["link"]
             cleaned = clean_article(url)
 
-            # --- NEW: fallback for ACM or blocked sites ---
-            if not cleaned.get("content"):
-                cleaned["content"] = item.get("summary") or item.get("description") or ""
-            
-            if not cleaned["content"]:
-                continue  # still empty, skip
+            title = cleaned.get("title") or item.get("title")
+            doi = cleaned.get("doi")
+            content = cleaned.get("content") or item.get("summary") or ""
 
-            # Create article record
+            if not title or not content:
+                continue
+
+            # stable hash
+            h = compute_hash(doi, title)
+
+            if deduper.is_duplicate(h):
+                print(f"❌ Duplicate skipped: {title}")
+                continue
+
             article = {
                 "url": url,
-                "title": cleaned.get("title") or item.get("title"),
+                "title": title,
                 "published_at": item.get("published"),
-                "content": cleaned["content"],
-                "hash": compute_hash(cleaned["content"]),
+                "content": content,
+                "abstract": cleaned.get("abstract"),
+                "authors": cleaned.get("authors"),
+                "venue": cleaned.get("venue"),
+                "doi": doi,
+                "year": cleaned.get("year"),
+                "keywords": cleaned.get("keywords"),
+                "hash": h,
                 "category": category,
                 "summary_brief": None,
                 "summary_extended": None,
+                "visual_path": None,
             }
 
-            # Dedup check (in-memory + DB)
-            if deduper.is_duplicate(article["hash"]):
-                print(f"❌ Duplicate skipped: {article['title']}")
-                continue
-
             db.insert_article(article)
+            print(f"✅ Inserted: {title}")
 
 if __name__ == "__main__":
     run_ingestion()

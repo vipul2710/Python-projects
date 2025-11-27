@@ -1,52 +1,93 @@
 # src/summarize/summarizer.py
-from pathlib import Path
+
 import textwrap
+from datetime import datetime
 from src.normalize.db import Database
 from src.summarize.model_router import ModelRouter
 
-PROMPT_DIR = Path("configs/prompts")
-
-def load_prompt(name: str) -> str:
-    p = PROMPT_DIR / name
-    return p.read_text(encoding="utf-8")
 
 class Summarizer:
-    def __init__(self, provider: str = "openai"):
+    """
+    SIMPLE + STABLE summarizer:
+    - NO metadata extraction (we already get perfect metadata from ingestion)
+    - Only generates brief + extended summary
+    - Saves to DB
+    """
+
+    def __init__(self, provider="openai"):
         self.db = Database()
-        self.brief_prompt = load_prompt("brief.md")
-        self.extended_prompt = load_prompt("extended.md")
         self.router = ModelRouter()
         self.provider = provider
 
-    def get_pending_articles(self, limit: int = 10, category: str = None):
-        tbl = self.db.db["articles"]
-        where = "summary_brief IS NULL"
-        params = {}
-        if category:
-            where += " AND category = :cat"
-            params["cat"] = category
-        return list(tbl.rows_where(where + " ORDER BY published_at DESC", params, limit=limit))
+        # Load prompt files
+        with open("configs/prompts/brief.md", "r", encoding="utf-8") as f:
+            self.brief_prompt = f.read()
+        with open("configs/prompts/extended.md", "r", encoding="utf-8") as f:
+            self.extended_prompt = f.read()
 
+    # ---------------------------------------
+    # SINGLE ARTICLE SUMMARIZATION
+    # ---------------------------------------
     def summarize_article(self, row):
         title = row.get("title") or ""
         content = row.get("content") or ""
-        snippet = textwrap.shorten(content, width=800, placeholder="...")
+        snippet = textwrap.shorten(content, width=900, placeholder="...")
 
-        prompt_for_brief = f"{self.brief_prompt}\n\nTitle: {title}\n\nArticle excerpt:\n{snippet}"
-        prompt_for_extended = f"{self.extended_prompt}\n\nTitle: {title}\n\nArticle excerpt:\n{snippet}"
+        # BRIEF
+        brief_prompt = (
+            f"{self.brief_prompt}\n\nTitle: {title}\n\nArticle excerpt:\n{snippet}"
+        )
+        brief = self.router.complete(
+            brief_prompt,
+            provider=self.provider,
+            mode="brief",
+            category=row.get("category", "General"),
+        )
 
-        brief = self.router.complete(prompt_for_brief, provider=self.provider, mode="brief", category=row.get("category","General"))
-        extended = self.router.complete(prompt_for_extended, provider=self.provider, mode="extended", category=row.get("category","General"))
-        return brief, extended
+        # EXTENDED
+        long_prompt = (
+            f"{self.extended_prompt}\n\nTitle: {title}\n\nArticle excerpt:\n{snippet}"
+        )
+        extended = self.router.complete(
+            long_prompt,
+            provider=self.provider,
+            mode="extended",
+            category=row.get("category", "General"),
+        )
 
-    def run(self, limit: int = 10, category: str = None):
-        pending = self.get_pending_articles(limit=limit, category=category)
-        print(f"🔎 Found {len(pending)} articles to summarize (category={category}).")
-        for row in pending:
-            brief, extended = self.summarize_article(row)
-            pk = row["id"]
-            self.db.db["articles"].update(pk, {
-                "summary_brief": brief,
-                "summary_extended": extended
-            })
-            print(f"✅ Summarized: {row.get('title')}")
+        return {"summary_brief": brief, "summary_extended": extended}
+
+    # ---------------------------------------
+    # SAVE into DB
+    # ---------------------------------------
+    def save_summary(self, row_id, data):
+        tbl = self.db.db["articles"]
+        tbl.update(row_id, data)
+
+
+    # ---------------------------------------
+    # MAIN RUN
+    # ---------------------------------------
+    def run(self, limit=5):
+        tbl = self.db.db["articles"]
+
+        rows = list(
+            tbl.rows_where(
+                "summary_brief IS NULL OR summary_brief = '' LIMIT :lim",
+                {"lim": limit},
+            )
+        )
+        print(f"📝 Pending summaries: {len(rows)}")
+
+        for row in rows:
+            try:
+                print(f"➡ Summarizing: {row['title']}")
+
+                result = self.summarize_article(row)
+
+                # PRIMARY KEY = hash
+                self.save_summary(row["hash"], result)
+
+                print(f"✅ Saved summary: {row['title']}")
+            except Exception as e:
+                print(f"❌ Failed: {row['title']} → {e}")
